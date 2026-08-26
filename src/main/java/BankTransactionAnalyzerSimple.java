@@ -12,7 +12,7 @@ public class BankTransactionAnalyzerSimple {
     public static void main(final String... args) throws IOException {
         final BankStatementCSVParser bankStatementParser = new BankStatementCSVParser();
         final String fileName = args[0];
-        final Path path = Paths.get(RESOURCES + args[0]);
+        final Path path = Paths.get(RESOURCES + fileName);
         final List<String> lines = Files.readAllLines(path);
 
         final List<BankTransaction> bankTransactions = bankStatementParser.parseLinesFromCSV(lines);
