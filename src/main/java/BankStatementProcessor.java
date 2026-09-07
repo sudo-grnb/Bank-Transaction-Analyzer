@@ -1,6 +1,5 @@
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class BankStatementProcessor {
     private final List<BankTransaction> bankTransactions;
@@ -49,5 +48,53 @@ public class BankStatementProcessor {
         }
 
         return total;
+    }
+
+    public BankTransaction selectHighestCostInMonth(final Month month) {
+        BankTransaction currentHighestCost = null;
+        for (final BankTransaction bankTransaction : bankTransactions) {
+            if (bankTransaction.getDate().getMonth() != month || bankTransaction.getAmount() >= 0) continue;
+
+            if (currentHighestCost == null) {
+                currentHighestCost = bankTransaction; continue;
+            }
+
+            currentHighestCost = currentHighestCost.getAmount() >  bankTransaction.getAmount() ?
+                    bankTransaction : currentHighestCost;
+        }
+
+        return currentHighestCost;
+    }
+
+    public BankTransaction selectLowestCostInMonth(final Month month) {
+        BankTransaction currentLowestCost = null;
+        for (final BankTransaction bankTransaction : bankTransactions) {
+            if (bankTransaction.getDate().getMonth() != month || bankTransaction.getAmount() >= 0) continue;
+
+            if (currentLowestCost == null) {
+                currentLowestCost = bankTransaction; continue;
+            }
+
+            currentLowestCost = currentLowestCost.getAmount() <  bankTransaction.getAmount() ?
+                    bankTransaction : currentLowestCost;
+        }
+
+        return currentLowestCost;
+    }
+
+    public Map<Month, Double> groupCostsByMonths() {
+        Map<Month, Double> result = new LinkedHashMap<>();
+        for (final BankTransaction bankTransaction : bankTransactions) {
+            if (bankTransaction.getAmount() >= 0) continue;
+
+            if (result.containsKey(bankTransaction.getDate().getMonth())) {
+                result.compute(
+                        bankTransaction.getDate().getMonth(),
+                        (month, amount) -> amount + bankTransaction.getAmount()
+                );
+            }
+            result.putIfAbsent(bankTransaction.getDate().getMonth(), bankTransaction.getAmount());
+        }
+        return result;
     }
 }
